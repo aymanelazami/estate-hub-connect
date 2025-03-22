@@ -11,9 +11,11 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Agencies from "./pages/Agencies";
+import AgencyProfile from "./pages/AgencyProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgencyDashboard from "./pages/AgencyDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,9 +32,11 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/agencies" element={<Agencies />} />
+            <Route path="/agencies/:id" element={<AgencyProfile />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

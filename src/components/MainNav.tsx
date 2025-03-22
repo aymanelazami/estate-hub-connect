@@ -12,7 +12,8 @@ import {
   UserPlus, 
   LogOut, 
   User,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,9 +50,9 @@ export function MainNav() {
           icon: <LayoutDashboard className="h-4 w-4" /> 
         },
         { 
-          name: 'Profile', 
-          href: '/profile', 
-          icon: <User className="h-4 w-4" /> 
+          name: 'Settings', 
+          href: '/settings', 
+          icon: <Settings className="h-4 w-4" /> 
         },
       ]
     : [
