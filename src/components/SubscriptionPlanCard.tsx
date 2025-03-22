@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface SubscriptionPlanCardProps {
   plan: SubscriptionPlanDetails;
   isSelected?: boolean;
-  isActive?: boolean; // Add this prop for backward compatibility
+  isActive?: boolean; // Support for backward compatibility
   onSelect?: (planName: string) => void;
   className?: string;
 }
