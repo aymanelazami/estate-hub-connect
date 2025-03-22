@@ -7,23 +7,28 @@ import { cn } from '@/lib/utils';
 interface SubscriptionPlanCardProps {
   plan: SubscriptionPlanDetails;
   isSelected?: boolean;
+  isActive?: boolean; // Add this prop for backward compatibility
   onSelect?: (planName: string) => void;
   className?: string;
 }
 
 export function SubscriptionPlanCard({ 
   plan, 
-  isSelected = false, 
+  isSelected = false,
+  isActive, // Support the isActive prop
   onSelect,
   className
 }: SubscriptionPlanCardProps) {
   const { name, displayName, price, propertyLimit, features, recommended } = plan;
+  
+  // Use isActive as a fallback if isSelected is not provided
+  const isCardSelected = isSelected || isActive || false;
 
   return (
     <div 
       className={cn(
         "relative rounded-xl border p-6 transition-all duration-200 hover:shadow-md",
-        isSelected ? "border-estate-500 bg-estate-50/50 shadow dark:bg-estate-900/10" : "bg-card",
+        isCardSelected ? "border-estate-500 bg-estate-50/50 shadow dark:bg-estate-900/10" : "bg-card",
         recommended ? "ring-2 ring-estate-500 ring-offset-2 dark:ring-offset-background" : "",
         className
       )}
@@ -61,14 +66,14 @@ export function SubscriptionPlanCard({
       
       <div className="mt-6">
         <Button 
-          variant={isSelected ? "default" : "outline"} 
+          variant={isCardSelected ? "default" : "outline"} 
           className={cn(
             "w-full",
-            isSelected && "bg-estate-600 hover:bg-estate-700"
+            isCardSelected && "bg-estate-600 hover:bg-estate-700"
           )}
           onClick={() => onSelect?.(name)}
         >
-          {isSelected ? "Current Plan" : "Select Plan"}
+          {isCardSelected ? "Current Plan" : "Select Plan"}
         </Button>
       </div>
     </div>

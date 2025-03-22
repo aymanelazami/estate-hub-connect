@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
@@ -29,7 +28,6 @@ const Settings = () => {
   const { user, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  // For demo purposes, we'll use the first agency from mock data
   const agencyData = initializeMockData().agencies[0];
   const [agencyForm, setAgencyForm] = useState<Partial<Agency>>({
     name: agencyData.name,
@@ -41,7 +39,6 @@ const Settings = () => {
     address: agencyData.address,
   });
   
-  // Redirect if not logged in
   if (!user) {
     return <Navigate to="/login" />;
   }
@@ -55,7 +52,6 @@ const Settings = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       toast.success('Agency details updated successfully');
@@ -83,7 +79,6 @@ const Settings = () => {
       <div className="container py-8 animate-fade-up">
         <Tabs defaultValue="profile" className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Sidebar */}
             <div className="md:col-span-1">
               <TabsList className="flex flex-col h-auto bg-transparent space-y-2 p-0">
                 <TabsTrigger 
@@ -149,7 +144,6 @@ const Settings = () => {
               </TabsList>
             </div>
             
-            {/* Content */}
             <div className="md:col-span-3">
               <TabsContent value="profile" className="mt-0">
                 <div className="bg-card rounded-lg border p-6">
@@ -359,7 +353,7 @@ const Settings = () => {
                           <SubscriptionPlanCard 
                             key={plan.name} 
                             plan={plan} 
-                            isActive={plan.name === agencyData.subscriptionPlan}
+                            isSelected={plan.name === agencyData.subscriptionPlan}
                           />
                         ))}
                       </div>
