@@ -119,7 +119,7 @@ const Agencies = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Locations</SelectItem>
+                    <SelectItem value="all-locations">All Locations</SelectItem>
                     {locations.map(location => (
                       <SelectItem key={location} value={location}>
                         {location}
@@ -141,7 +141,7 @@ const Agencies = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Plans</SelectItem>
+                    <SelectItem value="all-plans">All Plans</SelectItem>
                     <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="standard">Standard</SelectItem>
                     <SelectItem value="premium">Premium</SelectItem>
