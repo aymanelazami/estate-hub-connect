@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -43,17 +42,42 @@ export default function Properties() {
       );
     }
     
-    // Apply specific filters
+    // Apply location filter (now supports multiple locations)
     if (filters.location) {
-      results = results.filter(property => 
-        property.city.toLowerCase() === filters.location?.toLowerCase()
-      );
+      if (Array.isArray(filters.location)) {
+        // If multiple locations are selected
+        if (filters.location.length > 0) {
+          results = results.filter(property => 
+            filters.location.some(loc => 
+              property.city.toLowerCase() === loc.toLowerCase()
+            )
+          );
+        }
+      } else {
+        // Backward compatibility for single location
+        results = results.filter(property => 
+          property.city.toLowerCase() === filters.location?.toLowerCase()
+        );
+      }
     }
     
+    // Apply property type filter (now supports multiple property types)
     if (filters.propertyType) {
-      results = results.filter(property => 
-        property.propertyType.toLowerCase() === filters.propertyType?.toLowerCase()
-      );
+      if (Array.isArray(filters.propertyType)) {
+        // If multiple property types are selected
+        if (filters.propertyType.length > 0) {
+          results = results.filter(property => 
+            filters.propertyType.some(type => 
+              property.propertyType.toLowerCase() === type.toLowerCase()
+            )
+          );
+        }
+      } else {
+        // Backward compatibility for single property type
+        results = results.filter(property => 
+          property.propertyType.toLowerCase() === filters.propertyType?.toLowerCase()
+        );
+      }
     }
     
     if (filters.minPrice !== undefined) {
@@ -120,7 +144,6 @@ export default function Properties() {
     setShowPropertyDialog(false);
   };
 
-  // Determine back link based on user role
   const getBackLink = () => {
     if (user?.role === 'admin') {
       return '/admin-dashboard';

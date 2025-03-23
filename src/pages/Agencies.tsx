@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { MainNav } from '@/components/MainNav';
 import { Footer } from '@/components/Footer';
@@ -32,11 +31,23 @@ const Agencies = () => {
       );
     }
     
-    // Apply specific filters
+    // Apply location filter (now supports multiple locations)
     if (filters.location) {
-      results = results.filter(agency => 
-        agency.location.toLowerCase() === filters.location?.toLowerCase()
-      );
+      if (Array.isArray(filters.location)) {
+        // If multiple locations are selected
+        if (filters.location.length > 0) {
+          results = results.filter(agency => 
+            filters.location.some(loc => 
+              agency.location.toLowerCase() === loc.toLowerCase()
+            )
+          );
+        }
+      } else {
+        // Backward compatibility for single location
+        results = results.filter(agency => 
+          agency.location.toLowerCase() === filters.location?.toLowerCase()
+        );
+      }
     }
     
     if (filters.subscriptionPlan) {

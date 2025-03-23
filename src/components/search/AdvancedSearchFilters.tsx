@@ -9,7 +9,8 @@ import {
   Star,
   Filter,
   X,
-  ArrowDownUp
+  ArrowDownUp,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,8 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from '@/components/ui/badge';
 import { SubscriptionPlan } from '@/types';
+import { cn } from '@/lib/utils';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 
 // Property Types
 const PROPERTY_TYPES = [
@@ -70,8 +73,8 @@ const PRICE_RANGES = [
 ];
 
 export interface SearchFilters {
-  location?: string;
-  propertyType?: string;
+  location?: string | string[];
+  propertyType?: string | string[];
   minPrice?: number;
   maxPrice?: number;
   minBedrooms?: number;
@@ -139,6 +142,29 @@ export function AdvancedSearchFilters({
     return index >= 0 ? index.toString() : '0';
   };
 
+  // For multi-select handling
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [propertyTypeOpen, setPropertyTypeOpen] = useState(false);
+
+  // Convert location to array if it's a string or undefined
+  const getLocationArray = (): string[] => {
+    if (!filters.location) return [];
+    return Array.isArray(filters.location) ? filters.location : [filters.location];
+  };
+
+  // Convert propertyType to array if it's a string or undefined
+  const getPropertyTypeArray = (): string[] => {
+    if (!filters.propertyType) return [];
+    return Array.isArray(filters.propertyType) ? filters.propertyType : [filters.propertyType];
+  };
+
+  // Toggle item in array helper function
+  const toggleArrayItem = (array: string[], item: string): string[] => {
+    return array.includes(item)
+      ? array.filter(i => i !== item)
+      : [...array, item];
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
@@ -157,49 +183,111 @@ export function AdvancedSearchFilters({
       </div>
 
       <div className="space-y-4">
-        {/* Location Filter */}
+        {/* Location Filter - Now with multi-select */}
         <div className="space-y-2">
           <Label htmlFor="location" className="text-sm font-medium">Location</Label>
-          <Select
-            value={filters.location || "any-location"}
-            onValueChange={(value) => handleFilterChange('location', value === "any-location" ? undefined : value)}
-          >
-            <SelectTrigger id="location" className="w-full">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="Any Location" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any-location">Any Location</SelectItem>
-              {LOCATIONS.map(location => (
-                <SelectItem key={location} value={location}>{location}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                role="combobox" 
+                aria-expanded={locationOpen}
+                className="w-full justify-start text-left font-normal"
+              >
+                <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+                {getLocationArray().length > 0 ? (
+                  getLocationArray().length === 1 
+                    ? getLocationArray()[0]
+                    : `${getLocationArray().length} locations selected`
+                ) : (
+                  "Any Location"
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Search location..." />
+                <CommandEmpty>No location found.</CommandEmpty>
+                <CommandGroup className="max-h-64 overflow-auto">
+                  {LOCATIONS.map((location) => {
+                    const isSelected = getLocationArray().includes(location);
+                    return (
+                      <CommandItem
+                        key={location}
+                        value={location}
+                        onSelect={() => {
+                          const updatedLocations = toggleArrayItem(getLocationArray(), location);
+                          handleFilterChange('location', updatedLocations.length > 0 ? updatedLocations : undefined);
+                        }}
+                      >
+                        <div className={cn(
+                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                          isSelected ? "bg-primary text-primary-foreground" : "opacity-50"
+                        )}>
+                          {isSelected && <Check className="h-3 w-3" />}
+                        </div>
+                        {location}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
 
-        {/* Property Type Filter - Only shown for properties search */}
+        {/* Property Type Filter - Only shown for properties search - Now with multi-select */}
         {type === 'properties' && (
           <div className="space-y-2">
             <Label htmlFor="propertyType" className="text-sm font-medium">Property Type</Label>
-            <Select
-              value={filters.propertyType || "any-type"}
-              onValueChange={(value) => handleFilterChange('propertyType', value === "any-type" ? undefined : value)}
-            >
-              <SelectTrigger id="propertyType" className="w-full">
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Any Type" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any-type">Any Type</SelectItem>
-                {PROPERTY_TYPES.map(type => (
-                  <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={propertyTypeOpen} onOpenChange={setPropertyTypeOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  role="combobox" 
+                  aria-expanded={propertyTypeOpen}
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <Building className="h-4 w-4 text-muted-foreground mr-2" />
+                  {getPropertyTypeArray().length > 0 ? (
+                    getPropertyTypeArray().length === 1 
+                      ? getPropertyTypeArray()[0]
+                      : `${getPropertyTypeArray().length} types selected`
+                  ) : (
+                    "Any Type"
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search property type..." />
+                  <CommandEmpty>No property type found.</CommandEmpty>
+                  <CommandGroup className="max-h-64 overflow-auto">
+                    {PROPERTY_TYPES.map((type) => {
+                      const isSelected = getPropertyTypeArray().includes(type.toLowerCase());
+                      return (
+                        <CommandItem
+                          key={type}
+                          value={type}
+                          onSelect={() => {
+                            const updatedTypes = toggleArrayItem(getPropertyTypeArray(), type.toLowerCase());
+                            handleFilterChange('propertyType', updatedTypes.length > 0 ? updatedTypes : undefined);
+                          }}
+                        >
+                          <div className={cn(
+                            "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                            isSelected ? "bg-primary text-primary-foreground" : "opacity-50"
+                          )}>
+                            {isSelected && <Check className="h-3 w-3" />}
+                          </div>
+                          {type}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
@@ -372,30 +460,66 @@ export function AdvancedSearchFilters({
 
       <div className="mt-4 pt-4 border-t">
         <div className="flex flex-wrap gap-2">
-          {filters.location && (
-            <Badge variant="outline" className="flex items-center gap-1.5">
-              <MapPin className="h-3 w-3" />
-              {filters.location}
-              <button 
-                onClick={() => handleFilterChange('location', undefined)}
-                className="ml-1 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
+          {Array.isArray(filters.location) && filters.location.length > 0 ? (
+            filters.location.map(loc => (
+              <Badge key={loc} variant="outline" className="flex items-center gap-1.5">
+                <MapPin className="h-3 w-3" />
+                {loc}
+                <button 
+                  onClick={() => {
+                    const updatedLocations = filters.location?.filter(l => l !== loc);
+                    handleFilterChange('location', updatedLocations?.length ? updatedLocations : undefined);
+                  }}
+                  className="ml-1 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))
+          ) : (
+            filters.location && (
+              <Badge variant="outline" className="flex items-center gap-1.5">
+                <MapPin className="h-3 w-3" />
+                {filters.location}
+                <button 
+                  onClick={() => handleFilterChange('location', undefined)}
+                  className="ml-1 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )
           )}
 
-          {filters.propertyType && (
-            <Badge variant="outline" className="flex items-center gap-1.5">
-              <Building className="h-3 w-3" />
-              {filters.propertyType}
-              <button 
-                onClick={() => handleFilterChange('propertyType', undefined)}
-                className="ml-1 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
+          {Array.isArray(filters.propertyType) && filters.propertyType.length > 0 ? (
+            filters.propertyType.map(type => (
+              <Badge key={type} variant="outline" className="flex items-center gap-1.5">
+                <Building className="h-3 w-3" />
+                {type}
+                <button 
+                  onClick={() => {
+                    const updatedTypes = filters.propertyType?.filter(t => t !== type);
+                    handleFilterChange('propertyType', updatedTypes?.length ? updatedTypes : undefined);
+                  }}
+                  className="ml-1 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))
+          ) : (
+            filters.propertyType && (
+              <Badge variant="outline" className="flex items-center gap-1.5">
+                <Building className="h-3 w-3" />
+                {filters.propertyType}
+                <button 
+                  onClick={() => handleFilterChange('propertyType', undefined)}
+                  className="ml-1 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )
           )}
 
           {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
