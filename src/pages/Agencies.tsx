@@ -4,28 +4,16 @@ import { MainNav } from '@/components/MainNav';
 import { Footer } from '@/components/Footer';
 import { AgencyCard } from '@/components/AgencyCard';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Agency, SubscriptionPlan } from '@/types';
+import { Agency } from '@/types';
 import { mockAgencies, initializeMockData } from '@/data/mockData';
-import { Building, Search, Filter, MapPin } from 'lucide-react';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Building } from 'lucide-react';
+import { AdvancedSearchContainer } from '@/components/search/AdvancedSearchContainer';
+import { SearchFilters } from '@/components/search/AdvancedSearchFilters';
 
 const Agencies = () => {
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [filteredAgencies, setFilteredAgencies] = useState<Agency[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | ''>('');
   const [isLoading, setIsLoading] = useState(true);
-
-  // Get unique locations from agencies
-  const locations = [...new Set(mockAgencies.map(agency => agency.location))];
 
   useEffect(() => {
     const data = initializeMockData();
@@ -34,35 +22,30 @@ const Agencies = () => {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    // Apply filters when any filter changes
-    let results = agencies;
-
+  const handleSearch = (searchTerm: string, filters: SearchFilters) => {
+    let results = [...agencies];
+    
+    // Filter by search term
     if (searchTerm) {
       results = results.filter(agency => 
         agency.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
-    if (selectedLocation) {
+    
+    // Apply specific filters
+    if (filters.location) {
       results = results.filter(agency => 
-        agency.location === selectedLocation
+        agency.location.toLowerCase() === filters.location?.toLowerCase()
       );
     }
-
-    if (selectedPlan) {
+    
+    if (filters.subscriptionPlan) {
       results = results.filter(agency => 
-        agency.subscriptionPlan === selectedPlan
+        agency.subscriptionPlan === filters.subscriptionPlan
       );
     }
-
+    
     setFilteredAgencies(results);
-  }, [searchTerm, selectedLocation, selectedPlan, agencies]);
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setSelectedLocation('');
-    setSelectedPlan('');
   };
 
   return (
@@ -95,65 +78,10 @@ const Agencies = () => {
       {/* Filter Section */}
       <div className="border-b py-4 bg-background animate-fade-up" style={{ animationDelay: '100ms' }}>
         <div className="container">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search agencies..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="w-full sm:w-48">
-                <Select
-                  value={selectedLocation}
-                  onValueChange={setSelectedLocation}
-                >
-                  <SelectTrigger>
-                    <div className="flex gap-2 items-center">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="Location" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-locations">All Locations</SelectItem>
-                    {locations.map(location => (
-                      <SelectItem key={location} value={location}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="w-full sm:w-48">
-                <Select
-                  value={selectedPlan}
-                  onValueChange={(value) => setSelectedPlan(value as SubscriptionPlan | '')}
-                >
-                  <SelectTrigger>
-                    <div className="flex gap-2 items-center">
-                      <Filter className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="Plan" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-plans">All Plans</SelectItem>
-                    <SelectItem value="basic">Basic</SelectItem>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="premium">Premium</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
-            </div>
-          </div>
+          <AdvancedSearchContainer 
+            type="agencies"
+            onSearch={handleSearch}
+          />
         </div>
       </div>
       
@@ -197,7 +125,7 @@ const Agencies = () => {
               <p className="text-muted-foreground mb-6">
                 No agencies match your current search criteria.
               </p>
-              <Button onClick={clearFilters}>Clear Filters</Button>
+              <Button onClick={() => handleSearch('', {})}>Clear Filters</Button>
             </div>
           )}
         </div>
@@ -206,6 +134,6 @@ const Agencies = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default Agencies;

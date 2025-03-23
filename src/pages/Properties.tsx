@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mockProperties } from '@/data/mockData';
@@ -6,13 +7,9 @@ import { Property } from '@/types';
 import { 
   Building,
   Plus, 
-  Filter, 
-  Search,
-  SlidersHorizontal,
   ArrowLeft 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { 
   Pagination, 
   PaginationContent, 
@@ -23,21 +20,72 @@ import {
 } from '@/components/ui/pagination';
 import { PropertyDialog } from '@/components/PropertyDialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { AdvancedSearchContainer } from '@/components/search/AdvancedSearchContainer';
+import { SearchFilters } from '@/components/search/AdvancedSearchFilters';
 
 export default function Properties() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [properties, setProperties] = useState<Property[]>(mockProperties);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [allProperties, setAllProperties] = useState<Property[]>(mockProperties);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>(mockProperties);
   const [showPropertyDialog, setShowPropertyDialog] = useState(false);
   const [currentProperty, setCurrentProperty] = useState<Property | null>(null);
   
-  // Filter properties based on search term
-  const filteredProperties = properties.filter(property => 
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.propertyType.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearch = (searchTerm: string, filters: SearchFilters) => {
+    let results = [...allProperties];
+    
+    // Filter by search term
+    if (searchTerm) {
+      results = results.filter(property => 
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.propertyType.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply specific filters
+    if (filters.location) {
+      results = results.filter(property => 
+        property.city.toLowerCase() === filters.location?.toLowerCase()
+      );
+    }
+    
+    if (filters.propertyType) {
+      results = results.filter(property => 
+        property.propertyType.toLowerCase() === filters.propertyType?.toLowerCase()
+      );
+    }
+    
+    if (filters.minPrice !== undefined) {
+      results = results.filter(property => property.price >= (filters.minPrice || 0));
+    }
+    
+    if (filters.maxPrice !== undefined) {
+      results = results.filter(property => property.price <= (filters.maxPrice || Infinity));
+    }
+    
+    if (filters.minBedrooms) {
+      results = results.filter(property => 
+        property.bedrooms ? property.bedrooms >= filters.minBedrooms! : false
+      );
+    }
+    
+    if (filters.minBathrooms) {
+      results = results.filter(property => 
+        property.bathrooms ? property.bathrooms >= filters.minBathrooms! : false
+      );
+    }
+    
+    if (filters.status) {
+      results = results.filter(property => property.status === filters.status);
+    }
+    
+    if (filters.featured) {
+      results = results.filter(property => property.featured);
+    }
+    
+    setFilteredProperties(results);
+  };
 
   const handleAddProperty = () => {
     setCurrentProperty(null);
@@ -50,17 +98,25 @@ export default function Properties() {
   };
 
   const handleDeleteProperty = (propertyId: string) => {
-    setProperties(properties.filter(p => p.id !== propertyId));
+    const updatedProperties = allProperties.filter(p => p.id !== propertyId);
+    setAllProperties(updatedProperties);
+    setFilteredProperties(filteredProperties.filter(p => p.id !== propertyId));
   };
 
   const handleSaveProperty = (property: Property) => {
+    let updatedProperties;
+    
     if (currentProperty) {
       // Update existing property
-      setProperties(properties.map(p => p.id === property.id ? property : p));
+      updatedProperties = allProperties.map(p => p.id === property.id ? property : p);
     } else {
       // Add new property
-      setProperties([...properties, property]);
+      updatedProperties = [...allProperties, property];
     }
+    
+    setAllProperties(updatedProperties);
+    // Re-apply current search and filters
+    handleSearch('', {});
     setShowPropertyDialog(false);
   };
 
@@ -95,24 +151,10 @@ export default function Properties() {
         </div>
         
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex gap-2 items-center flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search properties..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <SlidersHorizontal className="h-4 w-4" />
-            </Button>
-          </div>
+          <AdvancedSearchContainer 
+            type="properties"
+            onSearch={handleSearch}
+          />
           
           <Button onClick={handleAddProperty} className="gap-1">
             <Plus className="h-4 w-4" />
@@ -125,14 +167,12 @@ export default function Properties() {
             <Building className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">No properties found</h3>
             <p className="text-muted-foreground mt-1">
-              {searchTerm ? "Try adjusting your search terms." : "Add your first property to get started."}
+              Try adjusting your search filters.
             </p>
-            {!searchTerm && (
-              <Button onClick={handleAddProperty} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Property
-              </Button>
-            )}
+            <Button onClick={handleAddProperty} className="mt-4">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Property
+            </Button>
           </div>
         ) : (
           <>
