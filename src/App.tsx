@@ -18,6 +18,7 @@ import AgentDashboard from "./pages/AgentDashboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Properties from "./pages/Properties";
+import PropertyDetails from "./pages/PropertyDetails";
 import BillingManagement from "./pages/BillingManagement";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
             <Route path="/properties" element={<Properties />} />
+            <Route path="/properties/:id" element={<PropertyDetails />} />
             <Route path="/billing" element={<BillingManagement />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
