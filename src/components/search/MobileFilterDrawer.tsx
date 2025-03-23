@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { Filter } from "lucide-react";
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Filter, X } from "lucide-react";
 import { AdvancedSearchFilters, SearchFilters } from "./AdvancedSearchFilters";
 
 interface MobileFilterDrawerProps {
@@ -33,7 +33,23 @@ export function MobileFilterDrawer({
         </Button>
       </DrawerTrigger>
       <DrawerContent className="p-6 pt-0">
-        <div className="mt-6 max-h-[80vh] overflow-y-auto pb-8">
+        <DrawerHeader className="px-0">
+          <DrawerTitle className="flex items-center justify-between">
+            <span>Filters</span>
+            {activeFiltersCount > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onClearFilters}
+                className="text-sm text-muted-foreground"
+              >
+                Clear all
+              </Button>
+            )}
+          </DrawerTitle>
+        </DrawerHeader>
+        
+        <div className="max-h-[70vh] overflow-y-auto pb-8">
           <AdvancedSearchFilters
             type={type}
             filters={filters}
@@ -42,6 +58,12 @@ export function MobileFilterDrawer({
             activeFiltersCount={activeFiltersCount}
           />
         </div>
+        
+        <DrawerFooter className="pt-2 px-0">
+          <DrawerClose asChild>
+            <Button>Apply Filters</Button>
+          </DrawerClose>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
