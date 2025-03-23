@@ -1,4 +1,4 @@
-export type UserRole = 'agent' | 'agency' | 'admin';
+export type UserRole = 'agent' | 'agency' | 'admin' | 'user';
 
 export type SubscriptionPlan = 'basic' | 'standard' | 'premium';
 

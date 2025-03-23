@@ -23,7 +23,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('agent');
+  const [role, setRole] = useState<UserRole>('user');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -147,6 +147,7 @@ const SignUp = () => {
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="user">Regular User</SelectItem>
                       <SelectItem value="agent">Real Estate Agent</SelectItem>
                       <SelectItem value="agency">Real Estate Agency</SelectItem>
                     </SelectContent>

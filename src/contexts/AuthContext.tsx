@@ -36,6 +36,13 @@ const mockUsers: User[] = [
     role: 'agent',
     createdAt: new Date(),
   },
+  {
+    id: '4',
+    name: 'Regular User',
+    email: 'user@example.com',
+    role: 'user',
+    createdAt: new Date(),
+  },
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

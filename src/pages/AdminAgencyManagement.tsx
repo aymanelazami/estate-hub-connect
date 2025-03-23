@@ -4,29 +4,19 @@ import { Link } from 'react-router-dom';
 import { MainNav } from '@/components/MainNav';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { mockAgencies } from '@/data/mockData';
-import { Agency, SubscriptionPlan, SUBSCRIPTION_PLANS } from '@/types';
+import { Agency } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { AgencyCard } from '@/components/AgencyCard';
-import { ArrowLeft, Building, Plus, Search, Check, X } from 'lucide-react';
+import { ArrowLeft, Building, Search, Check, X } from 'lucide-react';
+import { CreateAgencyForm } from '@/components/admin/CreateAgencyForm';
 
 const AdminAgencyManagement = () => {
   const [agencies, setAgencies] = useState<Agency[]>(mockAgencies);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newAgency, setNewAgency] = useState({
-    name: '',
-    email: '',
-    website: '',
-    address: '',
-    location: '',
-    subscriptionPlan: 'basic' as SubscriptionPlan,
-  });
   const { toast } = useToast();
 
   const filteredAgencies = agencies.filter(agency => 
@@ -34,50 +24,8 @@ const AdminAgencyManagement = () => {
     agency.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewAgency(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (value: string) => {
-    setNewAgency(prev => ({ ...prev, subscriptionPlan: value as SubscriptionPlan }));
-  };
-
-  const handleCreateAgency = () => {
-    // In a real app, this would create the agency in the database
-    const newId = `agency-${Date.now()}`;
-    const newUserId = `user-${Date.now()}`;
-    
-    const agency: Agency = {
-      id: newId,
-      userId: newUserId,
-      name: newAgency.name,
-      website: newAgency.website || undefined,
-      location: newAgency.location,
-      address: newAgency.address,
-      subscriptionPlan: newAgency.subscriptionPlan,
-      verified: false,
-      agents: [],
-      properties: [],
-      createdAt: new Date(),
-    };
-    
-    setAgencies([...agencies, agency]);
-    
-    // Reset form
-    setNewAgency({
-      name: '',
-      email: '',
-      website: '',
-      address: '',
-      location: '',
-      subscriptionPlan: 'basic',
-    });
-    
-    toast({
-      title: "Agency Created",
-      description: `${agency.name} has been created successfully.`,
-    });
+  const handleAgencyCreated = (newAgency: Agency) => {
+    setAgencies([...agencies, newAgency]);
   };
 
   const toggleVerification = (agencyId: string) => {
@@ -178,91 +126,7 @@ const AdminAgencyManagement = () => {
           </TabsContent>
           
           <TabsContent value="create" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Create New Agency</CardTitle>
-                <CardDescription>
-                  Fill in the details to create a new agency account
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Agency Name</Label>
-                  <Input 
-                    id="name" 
-                    name="name" 
-                    value={newAgency.name} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Contact Email</Label>
-                  <Input 
-                    id="email" 
-                    name="email" 
-                    type="email" 
-                    value={newAgency.email} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="website">Website (Optional)</Label>
-                  <Input 
-                    id="website" 
-                    name="website" 
-                    value={newAgency.website} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input 
-                    id="location" 
-                    name="location" 
-                    value={newAgency.location} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Textarea 
-                    id="address" 
-                    name="address" 
-                    value={newAgency.address} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionPlan">Subscription Plan</Label>
-                  <Select
-                    value={newAgency.subscriptionPlan}
-                    onValueChange={handleSelectChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a plan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SUBSCRIPTION_PLANS.map(plan => (
-                        <SelectItem key={plan.name} value={plan.name}>
-                          {plan.displayName} (${plan.price}/month)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={handleCreateAgency} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Create Agency
-                </Button>
-              </CardFooter>
-            </Card>
+            <CreateAgencyForm onAgencyCreated={handleAgencyCreated} />
           </TabsContent>
         </Tabs>
       </div>

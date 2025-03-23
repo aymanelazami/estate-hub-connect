@@ -1,181 +1,96 @@
 
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { SUBSCRIPTION_PLANS, SubscriptionPlan, SubscriptionPlanDetails } from '@/types';
+import { useState } from 'react';
+import { MainNav } from '@/components/MainNav';
+import { Footer } from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionPlanCard } from '@/components/SubscriptionPlanCard';
-import { CreditCard, Receipt, Download, CheckCircle2, AlertCircle } from 'lucide-react';
+import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function BillingManagement() {
-  const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>('standard');
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(currentPlan);
+const BillingManagement = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(user?.role === 'agency' ? 'standard' : 'basic');
+  const [processing, setProcessing] = useState(false);
 
-  const handlePlanSelect = (planName: string) => {
-    setSelectedPlan(planName as SubscriptionPlan);
+  const handlePlanSelect = (plan: string) => {
+    setSelectedPlan(plan as SubscriptionPlan);
   };
 
-  const handleUpdatePlan = () => {
-    if (selectedPlan === currentPlan) {
-      toast('You are already on this plan');
-      return;
-    }
+  const handleSubscribe = () => {
+    setProcessing(true);
     
-    setCurrentPlan(selectedPlan);
-    toast.success(`Successfully updated to ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} plan!`);
+    // Simulate API call to update subscription
+    setTimeout(() => {
+      setProcessing(false);
+      toast.success(`Successfully subscribed to ${selectedPlan} plan!`);
+    }, 1500);
   };
-
-  // Mock invoices data
-  const invoices = [
-    { id: 'INV-001', date: '2023-09-01', amount: 79, status: 'paid' },
-    { id: 'INV-002', date: '2023-08-01', amount: 79, status: 'paid' },
-    { id: 'INV-003', date: '2023-07-01', amount: 79, status: 'paid' },
-    { id: 'INV-004', date: '2023-06-01', amount: 29, status: 'paid' },
-  ];
 
   return (
-    <div className="container py-8 max-w-7xl mx-auto">
-      <div className="flex flex-col space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold">Billing Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your subscription and billing information
-          </p>
+    <div className="min-h-screen flex flex-col">
+      <MainNav />
+      
+      <div className="container py-8 mt-20">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mb-4"
+          onClick={() => navigate('/settings')}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Settings
+        </Button>
+        
+        <h1 className="text-3xl font-bold mb-2">Billing & Subscription</h1>
+        <p className="text-muted-foreground mb-8">
+          Manage your subscription plans and billing details
+        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Choose a Plan</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {SUBSCRIPTION_PLANS.map((plan) => (
+                <SubscriptionPlanCard
+                  key={plan.name}
+                  plan={plan}
+                  isSelected={selectedPlan === plan.name}
+                  onSelect={handlePlanSelect}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="pt-6 border-t">
+            <h2 className="text-xl font-semibold mb-4">Payment Details</h2>
+            {/* Payment form would go here in a real application */}
+            <div className="bg-muted/50 p-8 rounded-xl border text-center">
+              <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Payment Gateway Integration</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                In a production app, this would be integrated with Stripe, PayPal, or another payment processor.
+              </p>
+              <Button 
+                onClick={handleSubscribe} 
+                disabled={processing}
+                className="min-w-32"
+              >
+                {processing ? "Processing..." : "Subscribe Now"}
+              </Button>
+            </div>
+          </div>
         </div>
-
-        <Tabs defaultValue="subscriptions">
-          <TabsList className="mb-4">
-            <TabsTrigger value="subscriptions">Subscription Plans</TabsTrigger>
-            <TabsTrigger value="billing-history">Billing History</TabsTrigger>
-            <TabsTrigger value="payment-methods">Payment Methods</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="subscriptions" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Plan</CardTitle>
-                <CardDescription>
-                  You are currently on the {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} plan.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {SUBSCRIPTION_PLANS.map((plan) => (
-                    <SubscriptionPlanCard
-                      key={plan.name}
-                      plan={plan}
-                      isSelected={selectedPlan === plan.name}
-                      onSelect={handlePlanSelect}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <p className="text-sm text-muted-foreground">
-                  * Plans are billed monthly. You can upgrade or downgrade at any time.
-                </p>
-                {selectedPlan !== currentPlan && (
-                  <Button onClick={handleUpdatePlan}>
-                    Update Subscription
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="billing-history">
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing History</CardTitle>
-                <CardDescription>
-                  View your past invoices and payment history
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Invoice</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {invoices.map((invoice) => (
-                      <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.id}</TableCell>
-                        <TableCell>{invoice.date}</TableCell>
-                        <TableCell>${invoice.amount}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            {invoice.status === 'paid' ? (
-                              <>
-                                <CheckCircle2 className="h-4 w-4 text-green-500 mr-1" />
-                                <span>Paid</span>
-                              </>
-                            ) : (
-                              <>
-                                <AlertCircle className="h-4 w-4 text-yellow-500 mr-1" />
-                                <span>Pending</span>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                            <Download className="h-4 w-4" />
-                            <span>Download</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="payment-methods">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Methods</CardTitle>
-                <CardDescription>
-                  Manage your payment methods and billing address
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="border rounded-lg p-4 flex items-start space-x-4">
-                  <CreditCard className="h-10 w-10 text-muted-foreground" />
-                  <div className="space-y-1">
-                    <p className="font-medium">Visa ending in 4242</p>
-                    <p className="text-sm text-muted-foreground">Expiring 12/2025</p>
-                    <div className="flex items-center mt-2 text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full w-fit">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Default payment method
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                  <Button variant="outline" className="gap-1">
-                    <CreditCard className="h-4 w-4" />
-                    Add payment method
-                  </Button>
-                  
-                  <Button variant="outline" className="gap-1">
-                    <Receipt className="h-4 w-4" />
-                    Update billing address
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+      </div>
+      
+      <div className="mt-auto">
+        <Footer />
       </div>
     </div>
   );
-}
+};
+
+export default BillingManagement;
