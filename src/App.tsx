@@ -12,7 +12,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Agencies from "./pages/Agencies";
 import AgencyProfile from "./pages/AgencyProfile";
+import AgentProfile from "./pages/AgentProfile";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAgencyManagement from "./pages/AdminAgencyManagement";
 import AgencyDashboard from "./pages/AgencyDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
 import Settings from "./pages/Settings";
@@ -36,7 +38,9 @@ const App = () => (
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/agencies" element={<Agencies />} />
             <Route path="/agencies/:id" element={<AgencyProfile />} />
+            <Route path="/agents/:id" element={<AgentProfile />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin-agency-management" element={<AdminAgencyManagement />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
             <Route path="/properties" element={<Properties />} />

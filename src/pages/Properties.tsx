@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mockProperties } from '@/data/mockData';
 import { Property } from '@/types';
@@ -9,7 +8,8 @@ import {
   Plus, 
   Filter, 
   Search,
-  SlidersHorizontal 
+  SlidersHorizontal,
+  ArrowLeft 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,9 +22,11 @@ import {
   PaginationPrevious 
 } from '@/components/ui/pagination';
 import { PropertyDialog } from '@/components/PropertyDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Properties() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [properties, setProperties] = useState<Property[]>(mockProperties);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPropertyDialog, setShowPropertyDialog] = useState(false);
@@ -62,14 +64,34 @@ export default function Properties() {
     setShowPropertyDialog(false);
   };
 
+  // Determine back link based on user role
+  const getBackLink = () => {
+    if (user?.role === 'admin') {
+      return '/admin-dashboard';
+    } else if (user?.role === 'agency') {
+      return '/agency-dashboard';
+    } else if (user?.role === 'agent') {
+      return '/agent-dashboard';
+    }
+    return '/';
+  };
+
   return (
     <div className="container py-8 max-w-7xl mx-auto">
       <div className="flex flex-col space-y-6">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold">Properties</h1>
-          <p className="text-muted-foreground">
-            Manage your property listings
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-2">
+            <h1 className="text-3xl font-bold">Properties</h1>
+            <p className="text-muted-foreground">
+              Manage your property listings
+            </p>
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <Link to={getBackLink()} className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
         </div>
         
         <div className="flex flex-wrap items-center justify-between gap-4">

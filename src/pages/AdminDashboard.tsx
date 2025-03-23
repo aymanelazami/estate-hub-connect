@@ -1,6 +1,6 @@
 
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { MainNav } from '@/components/MainNav';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { mockAgencies, mockProperties, initializeMockData } from '@/data/mockData';
 import { useEffect, useState } from 'react';
 import { Agency, Property } from '@/types';
-import { Building, Home, CheckCircle, XCircle, Users, Download, Upload } from 'lucide-react';
+import { Building, Home, CheckCircle, XCircle, Users, Download, Upload, PlusCircle } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -68,6 +68,37 @@ const AdminDashboard = () => {
       </div>
       
       <div className="container py-8 animate-fade-up">
+        {/* Admin Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Button variant="outline" size="lg" className="h-auto p-6 justify-start" asChild>
+            <Link to="/admin-agency-management" className="flex items-start gap-4">
+              <div className="bg-estate-100 p-3 rounded-full">
+                <Building className="h-6 w-6 text-estate-600" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-lg">Agency Management</h3>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Create, edit, and manage agencies on the platform
+                </p>
+              </div>
+            </Link>
+          </Button>
+          
+          <Button variant="outline" size="lg" className="h-auto p-6 justify-start" asChild>
+            <Link to="/properties" className="flex items-start gap-4">
+              <div className="bg-estate-100 p-3 rounded-full">
+                <Home className="h-6 w-6 text-estate-600" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-lg">Property Management</h3>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Review, edit, and manage all property listings
+                </p>
+              </div>
+            </Link>
+          </Button>
+        </div>
+      
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-card border rounded-xl p-6">
             <div className="flex items-start justify-between">
@@ -125,6 +156,12 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Pending Agency Approvals</h2>
               <div className="flex gap-3">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/admin-agency-management" className="flex items-center gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Manage Agencies
+                  </Link>
+                </Button>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
                   <Upload className="h-4 w-4" />
                   Import
@@ -182,6 +219,12 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Pending Property Approvals</h2>
               <div className="flex gap-3">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/properties" className="flex items-center gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Manage Properties
+                  </Link>
+                </Button>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
                   <Upload className="h-4 w-4" />
                   Import

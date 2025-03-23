@@ -11,10 +11,12 @@ import { useState, useEffect } from 'react';
 import { Building, Home, Users, ArrowRight, Search, Filter, ChevronRight } from 'lucide-react';
 import { mockProperties, mockAgencies, initializeMockData } from '@/data/mockData';
 import { SUBSCRIPTION_PLANS } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [featuredProperties, setFeaturedProperties] = useState(mockProperties.filter(p => p.featured));
   const [topAgencies, setTopAgencies] = useState(mockAgencies.slice(0, 4));
+  const { user } = useAuth();
 
   useEffect(() => {
     // Initialize the relationships between entities
@@ -139,40 +141,42 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Subscription Plans Section */}
-      <section className="py-16 bg-secondary/50 border-y animate-fade-up">
-        <div className="container">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-estate-100 text-estate-800 text-sm font-medium mb-4">
-              <Users className="h-4 w-4 mr-2" />
-              For Agencies
+      {/* Subscription Plans Section - Only visible to agencies or when not logged in */}
+      {(!user || user.role === 'agency') && (
+        <section className="py-16 bg-secondary/50 border-y animate-fade-up">
+          <div className="container">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-estate-100 text-estate-800 text-sm font-medium mb-4">
+                <Users className="h-4 w-4 mr-2" />
+                For Agencies
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Choose the Right Plan for Your Agency</h2>
+              <p className="text-muted-foreground">
+                Select a subscription plan that fits your agency's needs and helps you reach more clients.
+              </p>
             </div>
-            <h2 className="text-3xl font-bold mb-4">Choose the Right Plan for Your Agency</h2>
-            <p className="text-muted-foreground">
-              Select a subscription plan that fits your agency's needs and helps you reach more clients.
-            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {SUBSCRIPTION_PLANS.map((plan) => (
+                <SubscriptionPlanCard 
+                  key={plan.name} 
+                  plan={plan} 
+                  onSelect={() => {}}
+                />
+              ))}
+            </div>
+            
+            <div className="text-center mt-12">
+              <Button size="lg" asChild>
+                <Link to="/sign-up" className="flex items-center gap-2">
+                  Join as an Agency
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {SUBSCRIPTION_PLANS.map((plan) => (
-              <SubscriptionPlanCard 
-                key={plan.name} 
-                plan={plan} 
-                onSelect={() => {}}
-              />
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Button size="lg" asChild>
-              <Link to="/sign-up" className="flex items-center gap-2">
-                Join as an Agency
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
       
       {/* Features Section */}
       <section className="py-16 container">
