@@ -161,8 +161,8 @@ export function AdvancedSearchFilters({
         <div className="space-y-2">
           <Label htmlFor="location" className="text-sm font-medium">Location</Label>
           <Select
-            value={filters.location || ''}
-            onValueChange={(value) => handleFilterChange('location', value)}
+            value={filters.location || "any-location"}
+            onValueChange={(value) => handleFilterChange('location', value === "any-location" ? undefined : value)}
           >
             <SelectTrigger id="location" className="w-full">
               <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export function AdvancedSearchFilters({
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any Location</SelectItem>
+              <SelectItem value="any-location">Any Location</SelectItem>
               {LOCATIONS.map(location => (
                 <SelectItem key={location} value={location}>{location}</SelectItem>
               ))}
@@ -184,8 +184,8 @@ export function AdvancedSearchFilters({
           <div className="space-y-2">
             <Label htmlFor="propertyType" className="text-sm font-medium">Property Type</Label>
             <Select
-              value={filters.propertyType || ''}
-              onValueChange={(value) => handleFilterChange('propertyType', value)}
+              value={filters.propertyType || "any-type"}
+              onValueChange={(value) => handleFilterChange('propertyType', value === "any-type" ? undefined : value)}
             >
               <SelectTrigger id="propertyType" className="w-full">
                 <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export function AdvancedSearchFilters({
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Type</SelectItem>
+                <SelectItem value="any-type">Any Type</SelectItem>
                 {PROPERTY_TYPES.map(type => (
                   <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
                 ))}
@@ -261,8 +261,8 @@ export function AdvancedSearchFilters({
             <div className="space-y-2">
               <Label htmlFor="bedrooms" className="text-sm font-medium">Bedrooms</Label>
               <Select
-                value={filters.minBedrooms?.toString() || ''}
-                onValueChange={(value) => handleFilterChange('minBedrooms', value ? Number(value) : undefined)}
+                value={filters.minBedrooms?.toString() || "any-bedrooms"}
+                onValueChange={(value) => handleFilterChange('minBedrooms', value === "any-bedrooms" ? undefined : Number(value))}
               >
                 <SelectTrigger id="bedrooms" className="w-full">
                   <div className="flex items-center gap-2">
@@ -271,7 +271,7 @@ export function AdvancedSearchFilters({
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any-bedrooms">Any</SelectItem>
                   <SelectItem value="1">1+</SelectItem>
                   <SelectItem value="2">2+</SelectItem>
                   <SelectItem value="3">3+</SelectItem>
@@ -284,8 +284,8 @@ export function AdvancedSearchFilters({
             <div className="space-y-2">
               <Label htmlFor="bathrooms" className="text-sm font-medium">Bathrooms</Label>
               <Select
-                value={filters.minBathrooms?.toString() || ''}
-                onValueChange={(value) => handleFilterChange('minBathrooms', value ? Number(value) : undefined)}
+                value={filters.minBathrooms?.toString() || "any-bathrooms"}
+                onValueChange={(value) => handleFilterChange('minBathrooms', value === "any-bathrooms" ? undefined : Number(value))}
               >
                 <SelectTrigger id="bathrooms" className="w-full">
                   <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export function AdvancedSearchFilters({
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any-bathrooms">Any</SelectItem>
                   <SelectItem value="1">1+</SelectItem>
                   <SelectItem value="2">2+</SelectItem>
                   <SelectItem value="3">3+</SelectItem>
@@ -310,8 +310,8 @@ export function AdvancedSearchFilters({
           <div className="space-y-2">
             <Label htmlFor="subscriptionPlan" className="text-sm font-medium">Subscription Plan</Label>
             <Select
-              value={filters.subscriptionPlan || ''}
-              onValueChange={(value) => handleFilterChange('subscriptionPlan', value as SubscriptionPlan)}
+              value={filters.subscriptionPlan || "any-plan"}
+              onValueChange={(value) => handleFilterChange('subscriptionPlan', value === "any-plan" ? undefined : value as SubscriptionPlan)}
             >
               <SelectTrigger id="subscriptionPlan" className="w-full">
                 <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export function AdvancedSearchFilters({
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Plan</SelectItem>
+                <SelectItem value="any-plan">Any Plan</SelectItem>
                 <SelectItem value="basic">Basic</SelectItem>
                 <SelectItem value="standard">Standard</SelectItem>
                 <SelectItem value="premium">Premium</SelectItem>
@@ -334,14 +334,14 @@ export function AdvancedSearchFilters({
           <div className="space-y-2">
             <Label htmlFor="status" className="text-sm font-medium">Status</Label>
             <Select
-              value={filters.status || ''}
-              onValueChange={(value) => handleFilterChange('status', value)}
+              value={filters.status || "any-status"}
+              onValueChange={(value) => handleFilterChange('status', value === "any-status" ? undefined : value)}
             >
               <SelectTrigger id="status" className="w-full">
                 <SelectValue placeholder="Any Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Status</SelectItem>
+                <SelectItem value="any-status">Any Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="sold">Sold</SelectItem>
