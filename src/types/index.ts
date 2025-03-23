@@ -1,4 +1,3 @@
-
 export type UserRole = 'agent' | 'agency' | 'admin';
 
 export type SubscriptionPlan = 'basic' | 'standard' | 'premium';
@@ -116,3 +115,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     ]
   }
 ];
+
+export interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+}
